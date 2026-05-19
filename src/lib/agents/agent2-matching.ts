@@ -1,5 +1,4 @@
 import type { Database } from '@/types/database'
-import type { ParsedRequest } from './agent1-language'
 
 type Provider = Database['public']['Tables']['providers']['Row']
 
@@ -25,7 +24,6 @@ function calculateSkillMatch(provider: Provider, serviceType: string): number {
   const service = serviceType.toLowerCase()
   const skill = provider.skill.toLowerCase()
 
-  // Exact specialization match
   if (
     provider.specializations.some((s) => s.toLowerCase().includes(service)) ||
     skill.includes(service)
@@ -33,7 +31,6 @@ function calculateSkillMatch(provider: Provider, serviceType: string): number {
     return 100
   }
 
-  // General skill match
   const serviceMap: Record<string, string[]> = {
     ac: ['ac', 'air conditioner', 'hvac'],
     electric: ['electric', 'wiring', 'light'],
@@ -74,20 +71,15 @@ function calculateCancellationScore(rate: number): number {
 }
 
 function calculateDistanceScore(): number {
-  // Mock: assume average distance for now
   return 75
 }
 
 function calculateRiskScore(riskScore: string): number {
   switch (riskScore) {
-    case 'low':
-      return 100
-    case 'medium':
-      return 60
-    case 'high':
-      return 20
-    default:
-      return 50
+    case 'low': return 100
+    case 'medium': return 60
+    case 'high': return 20
+    default: return 50
   }
 }
 
@@ -115,19 +107,17 @@ function calculateCapacityScore(provider: Provider): number {
 }
 
 export function agent2ProviderMatching(
-  request: ParsedRequest,
+  request: any,
   providers: Provider[]
 ): MatchingResult {
-  // Classify job complexity
   let jobComplexity: 'basic' | 'intermediate' | 'complex' = 'basic'
-  const desc = request.issueDescription.toLowerCase()
+  const desc = request.issueDescription?.toLowerCase() || ''
   if (desc.includes('replace') || desc.includes('install') || desc.includes('major')) {
     jobComplexity = 'complex'
   } else if (desc.includes('repair') || desc.includes('fix') || desc.includes('leak')) {
     jobComplexity = 'intermediate'
   }
 
-  // Filter by service type and city
   const filtered = providers.filter((p) => {
     const serviceMatch = calculateSkillMatch(p, request.serviceType) > 0
     const cityMatch = !request.location || p.city.toLowerCase().includes(request.location.toLowerCase())
@@ -146,7 +136,6 @@ export function agent2ProviderMatching(
 
   const priceScores = calculatePriceScore(candidates)
 
-  // Score each provider
   const scored = candidates.map((p) => {
     const skillMatch = calculateSkillMatch(p, request.serviceType)
     const ratingScore = calculateRatingScore(p.rating)
@@ -185,7 +174,6 @@ export function agent2ProviderMatching(
     }
   })
 
-  // Sort by match score, tiebreaker by on_time_score
   scored.sort((a, b) => {
     if (Math.abs(a.matchScore - b.matchScore) <= 3) {
       return b.provider.on_time_score - a.provider.on_time_score
@@ -193,7 +181,6 @@ export function agent2ProviderMatching(
     return b.matchScore - a.matchScore
   })
 
-  // Add whyNotFirst for non-top providers
   if (scored.length > 1) {
     const top = scored[0]
     for (let i = 1; i < scored.length; i++) {

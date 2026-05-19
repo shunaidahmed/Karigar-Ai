@@ -1,4 +1,6 @@
-import { callGemini, parseJsonResponse } from '@/lib/gemini'
+import type { Database } from '@/types/database'
+
+type Provider = Database['public']['Tables']['providers']['Row']
 
 export interface ParsedRequest {
   serviceType: string
@@ -16,7 +18,7 @@ export interface ParsedRequest {
   clarificationQuestion: string
 }
 
-// Direct keyword-based fallback parser for when Gemini fails
+// Direct keyword-based fallback parser for when DeepSeek fails
 function directParse(input: string): ParsedRequest {
   const lower = input.toLowerCase()
 
@@ -37,8 +39,8 @@ function directParse(input: string): ParsedRequest {
     }
   }
 
-  // Location detection (common Pakistan cities/areas)
-  const locationMap = ['islamabad', 'karachi', 'lahore', 'peshawar', 'multan', 'rawalpindi', 'faisalabad', 'g-13', 'g-11', 'g-10', 'f-10', 'f-8', 'f-7', 'f-6', 'i-8', 'i-10', 'defence', 'clifton', 'gulshan', 'gulberg', 'dha', 'johar town', 'model town', 'hayatabad', 'university town', ' Saddar', 'koral', 'bahria']
+  // Location detection
+  const locationMap = ['islamabad', 'karachi', 'lahore', 'peshawar', 'multan', 'rawalpindi', 'faisalabad', 'g-13', 'g-11', 'g-10', 'f-10', 'f-8', 'f-7', 'f-6', 'i-8', 'i-10', 'defence', 'clifton', 'gulshan', 'gulberg', 'dha', 'johar town', 'model town', 'hayatabad', 'university town', 'saddar', 'koral', 'bahria']
   let location = ''
   for (const loc of locationMap) {
     if (lower.includes(loc.toLowerCase())) {
@@ -160,18 +162,50 @@ Rules:
 - Always return valid JSON only`
 
   try {
-    const response = await callGemini(prompt)
-    const parsed = parseJsonResponse(response)
+    const response = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that returns ONLY valid JSON. No markdown, no code fences, no explanation.' },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 512,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const text = data.choices[0].message.content
     const processingTime = Date.now() - startTime
+
+    // Parse JSON response
+    let parsed: any
+    try {
+      let cleaned = text.trim()
+      if (cleaned.startsWith('```')) {
+        cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+      }
+      const match = cleaned.match(/\{[\s\S]*\}/)
+      parsed = JSON.parse(match ? match[0] : cleaned)
+    } catch {
+      // JSON parse failed, use direct parse
+      const direct = directParse(userInput)
+      return { ...direct, confidenceScore: Math.max(direct.confidenceScore, 65) }
+    }
 
     // Validate the parsed result
     if (!parsed.serviceType || parsed.serviceType.trim() === '') {
-      // Gemini couldn't identify service, use direct parse
       const direct = directParse(userInput)
-      return {
-        ...direct,
-        confidenceScore: Math.max(direct.confidenceScore, 65),
-      }
+      return { ...direct, confidenceScore: Math.max(direct.confidenceScore, 65) }
     }
 
     return {
@@ -190,8 +224,8 @@ Rules:
       clarificationQuestion: parsed.clarificationQuestion || '',
     }
   } catch (err) {
-    // Gemini API failed — use direct keyword parsing as fallback
-    console.log('Gemini API failed, using direct parse fallback:', err)
+    // DeepSeek API failed — use direct keyword parsing as fallback
+    console.log('DeepSeek API failed, using direct parse fallback:', err)
     const direct = directParse(userInput)
     return {
       ...direct,

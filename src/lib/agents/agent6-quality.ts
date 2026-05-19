@@ -1,5 +1,4 @@
 import type { Database } from '@/types/database'
-import { callGemini, parseJsonResponse } from '@/lib/gemini'
 
 type Provider = Database['public']['Tables']['providers']['Row']
 
@@ -13,6 +12,37 @@ export interface QualityResult {
   flagReason: string
   thankYouMessageUrdu: string
   thankYouMessageEnglish: string
+}
+
+async function callDeepSeek(prompt: string): Promise<any> {
+  const response = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that returns ONLY valid JSON. No markdown, no code fences, no explanation.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 512,
+    }),
+  })
+
+  if (!response.ok) throw new Error(`DeepSeek API error: ${response.status}`)
+
+  const data = await response.json()
+  const text = data.choices[0].message.content
+
+  let cleaned = text.trim()
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+  }
+  const match = cleaned.match(/\{[\s\S]*\}/)
+  return JSON.parse(match ? match[0] : cleaned)
 }
 
 export async function agent6ServiceQuality(
@@ -39,10 +69,7 @@ Analyse the feedback. Return ONLY valid JSON:
 }`
 
   try {
-    const response = await callGemini(prompt)
-    const parsed = parseJsonResponse(response)
-
-    // Calculate updated rating using weighted average (20% new, 80% existing)
+    const parsed = await callDeepSeek(prompt)
     const updatedRating = Math.round((provider.rating * 0.8 + userRating * 0.2) * 10) / 10
 
     return {
@@ -57,7 +84,6 @@ Analyse the feedback. Return ONLY valid JSON:
       thankYouMessageEnglish: parsed.thankYouMessageEnglish || 'Thank you for your feedback!',
     }
   } catch {
-    // Fallback calculation
     const updatedRating = Math.round((provider.rating * 0.8 + userRating * 0.2) * 10) / 10
     const sentimentLabel = userRating >= 4 ? 'positive' : userRating >= 3 ? 'neutral' : 'negative'
 

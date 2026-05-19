@@ -1,5 +1,3 @@
-import { callGemini, parseJsonResponse } from '@/lib/gemini'
-
 export interface DisputeResult {
   disputeSeverity: 'low' | 'medium' | 'high'
   likelyFault: 'user' | 'provider' | 'unclear'
@@ -12,6 +10,37 @@ export interface DisputeResult {
   escalationReason: string
   providerPenaltyApplied: boolean
   penaltyDetails: string
+}
+
+async function callDeepSeek(prompt: string): Promise<any> {
+  const response = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that returns ONLY valid JSON. No markdown, no code fences, no explanation.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 512,
+    }),
+  })
+
+  if (!response.ok) throw new Error(`DeepSeek API error: ${response.status}`)
+
+  const data = await response.json()
+  const text = data.choices[0].message.content
+
+  let cleaned = text.trim()
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+  }
+  const match = cleaned.match(/\{[\s\S]*\}/)
+  return JSON.parse(match ? match[0] : cleaned)
 }
 
 export async function agent7DisputeResolution(
@@ -44,20 +73,16 @@ Assess the dispute fairly. Return ONLY valid JSON:
 }`
 
   try {
-    const response = await callGemini(prompt)
-    const parsed = parseJsonResponse(response)
+    const parsed = await callDeepSeek(prompt)
 
-    // Apply escalation rules
     let escalateToHuman = parsed.escalateToHuman || false
     let escalationReason = parsed.escalationReason || ''
 
-    // Rule 3: Refund requests above PKR 5000 always escalate
     if (parsed.compensationPKR > 5000) {
       escalateToHuman = true
       escalationReason = 'Refund amount exceeds PKR 5000 threshold'
     }
 
-    // Rule 2: Provider with 5+ disputes gets temporarily suspended
     if (providerHistory.previousDisputes >= 5) {
       parsed.recommendedAction = 'suspend'
       parsed.providerPenaltyApplied = true
@@ -78,7 +103,6 @@ Assess the dispute fairly. Return ONLY valid JSON:
       penaltyDetails: parsed.penaltyDetails || '',
     }
   } catch {
-    // Fallback resolution
     const isPriceDispute = disputeType.toLowerCase().includes('price')
     const priceDiff = amountCharged - originalQuotedPrice
 
