@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // PWA headers
+  output: 'standalone',
   async headers() {
     return [
       {
@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Allow external Gemini API calls
   async rewrites() {
     return [
       {

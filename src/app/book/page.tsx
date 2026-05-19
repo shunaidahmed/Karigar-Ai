@@ -67,8 +67,8 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
 
   async function fetchProviders() {
     const supabase = createClient() as any
-    const { data } = await supabase.from('providers').select('*').eq('available', true)
-    if (data) setProviders(data)
+    const { data } = await supabase.from('providers').select('*').limit(250)
+    if (data) setProviders(data.filter((p: any) => p.available !== false))
   }
 
   async function handleSearch(input: string) {

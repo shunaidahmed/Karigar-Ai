@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env.local
+.env*.example
+.worktrees
+.DS_Store
+next-env.d.ts
+eslint.config.mjs
