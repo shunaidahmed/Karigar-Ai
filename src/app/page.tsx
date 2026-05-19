@@ -107,30 +107,54 @@ export default function HomePage() {
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="Describe what you need..."
-          className="w-full rounded-xl border border-gray-300 pl-4 pr-24 py-3 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-        />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-          <button
-            onClick={handleVoiceSearch}
-            className="p-2 text-gray-500 hover:text-emerald-600 rounded-lg hover:bg-gray-100"
-            aria-label="Voice search"
-          >
-            <Mic size={20} />
-          </button>
-          <button
-            onClick={handleSearch}
-            className="p-2 text-gray-500 hover:text-emerald-600 rounded-lg hover:bg-gray-100"
-            aria-label="Search"
-          >
-            <Search size={20} />
-          </button>
+      <div>
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="Describe what you need..."
+            className="w-full rounded-xl border border-gray-300 pl-4 pr-24 py-3 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+            <button
+              onClick={handleVoiceSearch}
+              className="p-2 text-gray-500 hover:text-emerald-600 rounded-lg hover:bg-gray-100"
+              aria-label="Voice search"
+            >
+              <Mic size={20} />
+            </button>
+            <button
+              onClick={handleSearch}
+              className="p-2 text-gray-500 hover:text-emerald-600 rounded-lg hover:bg-gray-100"
+              aria-label="Search"
+            >
+              <Search size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Quick examples */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {[
+            'AC theek karo G-13',
+            'Electrician chahiye',
+            'Plumber for leak',
+            'Math tutor needed',
+            'Car mechanic',
+          ].map((example) => (
+            <button
+              key={example}
+              onClick={() => {
+                setSearchQuery(example)
+                router.push(`/book?q=${encodeURIComponent(example)}`)
+              }}
+              className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-xs text-emerald-700 hover:bg-emerald-100"
+            >
+              {example}
+            </button>
+          ))}
         </div>
       </div>
 

@@ -71,13 +71,13 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
       // Add trace
       addTrace('agent_1', 'Language Understanding Agent', input, JSON.stringify(result))
 
-      if (result.confidenceScore < 60) {
-        setError('Could not understand your request. Please try again with more details.')
+      if (result.confidenceScore < 50) {
+        setError('Could not understand your request. Try examples like: "AC theek karo G-13 mein kal subah" or "Electrician chahiye Defence mein"')
         setLoading(false)
         return
       }
 
-      if (result.clarificationNeeded && result.confidenceScore < 80) {
+      if (result.clarificationNeeded && result.confidenceScore < 70) {
         setStep('clarification')
       } else {
         await findProviders(result)
@@ -298,6 +298,34 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
             >
               {loading ? '...' : 'Search'}
             </button>
+          </div>
+
+          {/* Example prompts */}
+          <div>
+            <p className="text-xs text-gray-500 mb-2">Try these examples:</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                'AC theek karo G-13 mein kal subah',
+                'Electrician chahiye Defence mein',
+                'Plumber for pipe leak in Lahore',
+                'Home tutor for math in Islamabad',
+                'Car mechanic engine problem Karachi',
+                'Bijli ka kaam F-10 mein aaj shaam',
+                'Pani ki pipe leak ho rahi hai',
+                'AC gas refill chahiye kal',
+              ].map((example) => (
+                <button
+                  key={example}
+                  onClick={() => {
+                    setQuery(example)
+                    handleSearch(example)
+                  }}
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-emerald-500 hover:text-emerald-600"
+                >
+                  {example}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
