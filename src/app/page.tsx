@@ -137,10 +137,11 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden animate-gradient">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 animate-float" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse" />
         
         <div className="relative">
           <div className="flex justify-between items-center mb-6">
@@ -181,14 +182,14 @@ export default function HomePage() {
 
       {/* Quick Actions */}
       <div className="px-5 -mt-4 relative z-10">
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-4 grid grid-cols-3 gap-4">
-          {quickActions.map((action) => (
+        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-4 grid grid-cols-3 gap-4 animate-scale-in">
+          {quickActions.map((action, idx) => (
             <button
               key={action.name}
               onClick={() => router.push(action.name === 'Quick Book' ? '/book' : action.name === 'Track Order' ? '/bookings' : '/disputes')}
-              className="flex flex-col items-center gap-2 group"
+              className={`flex flex-col items-center gap-2 group animate-slide-up stagger-${idx + 1}`}
             >
-              <div className={`w-12 h-12 ${action.bg} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+              <div className={`w-12 h-12 ${action.bg} rounded-2xl flex items-center justify-center group-hover:scale-110 group-active:scale-95 transition-all shadow-sm`}>
                 <action.icon size={20} className={action.color} />
               </div>
               <span className="text-xs font-medium text-gray-700">{action.name}</span>
@@ -198,18 +199,18 @@ export default function HomePage() {
       </div>
 
       {/* Promotional Banner */}
-      <div className="px-5 mt-6">
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-5 text-white relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -translate-y-4 translate-x-8" />
+      <div className="px-5 mt-6 animate-slide-up stagger-2">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-5 text-white relative overflow-hidden hover:shadow-lg hover:shadow-orange-200/50 transition-all cursor-pointer group">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -translate-y-4 translate-x-8 group-hover:scale-110 transition-transform" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={16} className="text-yellow-300" />
+              <Sparkles size={16} className="text-yellow-300 animate-pulse" />
               <span className="font-semibold">You're here! ✨</span>
             </div>
             <p className="text-sm text-white/90 mb-3">Let's make service things happen. Book your first karigar now!</p>
             <button
               onClick={() => router.push('/book')}
-              className="bg-white text-orange-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-all"
+              className="bg-white text-orange-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-orange-50 hover:scale-105 active:scale-95 transition-all"
             >
               Book Now →
             </button>
@@ -221,13 +222,14 @@ export default function HomePage() {
       <div className="px-5 mt-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Services</h2>
         <div className="grid grid-cols-3 gap-3">
-          {services.map((service) => (
+          {services.map((service, idx) => (
             <button
               key={service.name}
               onClick={() => router.push(`/book?q=${encodeURIComponent(service.name)}`)}
-              className={`${service.bg} rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-all active:scale-95`}
+              className={`${service.bg} rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 hover:shadow-md active:scale-95 transition-all animate-slide-up`}
+              style={{ animationDelay: `${idx * 0.05}s` }}
             >
-              <span className="text-3xl">{service.icon}</span>
+              <span className="text-3xl group-hover:animate-bounce">{service.icon}</span>
               <span className="text-xs font-medium text-gray-700 text-center">{service.name}</span>
             </button>
           ))}
@@ -238,12 +240,13 @@ export default function HomePage() {
       <div className="px-5 mt-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Why Karigar.ai?</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-hide">
-          {featuredCards.map((card) => (
+          {featuredCards.map((card, idx) => (
             <div
               key={card.title}
-              className={`bg-gradient-to-br ${card.color} rounded-2xl p-4 min-w-[160px] text-white flex-shrink-0`}
+              className={`bg-gradient-to-br ${card.color} rounded-2xl p-4 min-w-[160px] text-white flex-shrink-0 hover:scale-105 hover:shadow-lg transition-all cursor-pointer animate-slide-left`}
+              style={{ animationDelay: `${idx * 0.1}s` }}
             >
-              <card.icon size={24} className="mb-3 opacity-80" />
+              <card.icon size={24} className="mb-3 opacity-80 group-hover:opacity-100" />
               <h3 className="font-semibold text-sm">{card.title}</h3>
               <p className="text-xs text-white/80 mt-1">{card.subtitle}</p>
             </div>
@@ -253,22 +256,23 @@ export default function HomePage() {
 
       {/* Recent Bookings */}
       {recentBookings.length > 0 && (
-        <div className="px-5 mt-6">
+        <div className="px-5 mt-6 animate-slide-up stagger-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-900">Recent Bookings</h2>
             <button
               onClick={() => router.push('/bookings')}
-              className="text-sm text-emerald-600 font-medium flex items-center gap-1"
+              className="text-sm text-emerald-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
             >
               View All <ChevronRight size={16} />
             </button>
           </div>
           <div className="space-y-3">
-            {recentBookings.map((booking) => (
+            {recentBookings.map((booking, idx) => (
               <button
                 key={booking.id}
                 onClick={() => router.push(`/bookings/${booking.id}`)}
-                className="w-full bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all"
+                className="w-full bg-white rounded-2xl p-4 flex items-center justify-between shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all animate-fade-in"
+                style={{ animationDelay: `${idx * 0.1}s` }}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
