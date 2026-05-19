@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/components/auth/AuthProvider'
+import { useAuth, ProtectedRoute } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut, User, Globe, Wrench, Shield, Bell, ChevronRight } from 'lucide-react'
 import type { Language } from '@/lib/translations'
 
-export default function ProfilePage() {
+function ProfileContent() {
   const { user, supabase } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
@@ -58,7 +58,7 @@ export default function ProfilePage() {
       <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="relative text-center">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-3">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-3 animate-float">
             <User size={32} className="text-white" />
           </div>
           <h1 className="text-xl font-bold">{profile?.full_name || 'User'}</h1>
@@ -145,5 +145,13 @@ export default function ProfilePage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <ProfileContent />
+    </ProtectedRoute>
   )
 }

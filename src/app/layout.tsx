@@ -45,7 +45,7 @@ export default function RootLayout({
 
           {/* Mobile layout */}
           <div className="lg:hidden">
-            <main className="pb-16 max-w-lg mx-auto px-4">
+            <main className="pb-16 max-w-lg mx-auto">
               {children}
             </main>
             <div className="lg:hidden">

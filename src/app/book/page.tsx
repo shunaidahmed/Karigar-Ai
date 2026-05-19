@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAuth } from '@/components/auth/AuthProvider'
+import { useAuth, ProtectedRoute } from '@/components/auth/AuthProvider'
 import { AgentTracePanel } from '@/components/agents/AgentTracePanel'
 import { agent1LanguageUnderstanding, type ParsedRequest } from '@/lib/agents/agent1-language'
 import { agent2ProviderMatching, type RankedProvider } from '@/lib/agents/agent2-matching'
@@ -38,7 +38,7 @@ const steps = [
   { key: 'price', label: 'Price', icon: DollarSign },
 ]
 
-export default function BookPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+function BookContent({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const params = use(searchParams)
   const { user } = useAuth()
   const router = useRouter()
@@ -572,5 +572,13 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
       {/* Agent Trace Panel */}
       <AgentTracePanel traces={traces} />
     </div>
+  )
+}
+
+export default function BookPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  return (
+    <ProtectedRoute>
+      <BookContent searchParams={searchParams} />
+    </ProtectedRoute>
   )
 }

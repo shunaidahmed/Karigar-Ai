@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/components/auth/AuthProvider'
+import { useAuth, ProtectedRoute } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { Clock, CheckCircle, AlertCircle, CalendarPlus, ChevronRight, Sparkles } from 'lucide-react'
 
@@ -16,7 +16,7 @@ const statusConfig: Record<string, { icon: any; color: string; bg: string; label
   cancelled: { icon: AlertCircle, color: 'text-gray-400', bg: 'bg-gray-100', label: 'Cancelled' },
 }
 
-export default function BookingsPage() {
+function BookingsContent() {
   const { user } = useAuth()
   const router = useRouter()
   const [bookings, setBookings] = useState<any[]>([])
@@ -50,7 +50,7 @@ export default function BookingsPage() {
   if (bookings.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
-        <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mb-4">
+        <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mb-4 animate-float">
           <CalendarPlus size={32} className="text-emerald-600" />
         </div>
         <h2 className="text-xl font-bold text-gray-900">No bookings yet</h2>
@@ -112,5 +112,13 @@ export default function BookingsPage() {
         })}
       </div>
     </div>
+  )
+}
+
+export default function BookingsPage() {
+  return (
+    <ProtectedRoute>
+      <BookingsContent />
+    </ProtectedRoute>
   )
 }

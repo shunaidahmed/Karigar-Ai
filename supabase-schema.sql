@@ -10,6 +10,7 @@ create table public.profiles (
   area text,
   loyalty_status text default 'new' check (loyalty_status in ('new', 'returning')),
   language_preference text default 'en' check (language_preference in ('en', 'ur-rom', 'ur')),
+  onboarding_completed boolean default false,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

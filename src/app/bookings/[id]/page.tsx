@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/components/auth/AuthProvider'
+import { useAuth, ProtectedRoute } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { AgentTracePanel } from '@/components/agents/AgentTracePanel'
 import {
@@ -52,7 +52,7 @@ const initialSteps: BookingStep[] = [
   { key: 'feedback', label: 'Feedback Requested', description: 'Please rate your experience', icon: MessageCircle, estimatedTime: 'Your turn', status: 'pending', detail: 'Your feedback matters' },
 ]
 
-export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+function BookingDetailContent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { user } = useAuth()
   const router = useRouter()
@@ -358,5 +358,13 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
       {/* Agent Trace Panel */}
       <AgentTracePanel traces={traces} />
     </div>
+  )
+}
+
+export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  return (
+    <ProtectedRoute>
+      <BookingDetailContent params={params} />
+    </ProtectedRoute>
   )
 }

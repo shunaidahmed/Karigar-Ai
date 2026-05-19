@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAuth } from '@/components/auth/AuthProvider'
+import { useAuth, ProtectedRoute } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { agent7DisputeResolution, type DisputeResult } from '@/lib/agents/agent7-dispute'
 import { ArrowLeft, CheckCircle, AlertTriangle, MessageSquare, Shield, ChevronRight, Sparkles } from 'lucide-react'
@@ -17,7 +17,7 @@ const disputeTypes = [
   { value: 'lastMinuteCancel', label: 'Booking Cancelled Last Minute', icon: '⏰' },
 ]
 
-export default function DisputesPage({ searchParams }: { searchParams: Promise<{ booking?: string }> }) {
+function DisputesContent({ searchParams }: { searchParams: Promise<{ booking?: string }> }) {
   const params = use(searchParams)
   const { user } = useAuth()
   const router = useRouter()
@@ -299,5 +299,13 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
         </div>
       )}
     </div>
+  )
+}
+
+export default function DisputesPage({ searchParams }: { searchParams: Promise<{ booking?: string }> }) {
+  return (
+    <ProtectedRoute>
+      <DisputesContent searchParams={searchParams} />
+    </ProtectedRoute>
   )
 }
