@@ -33,7 +33,6 @@ const steps = [
   { key: 'providers', label: 'Provider', icon: Star },
   { key: 'schedule', label: 'Schedule', icon: Calendar },
   { key: 'price', label: 'Price', icon: DollarSign },
-  { key: 'confirm', label: 'Confirm', icon: CheckCircle },
 ]
 
 export default function BookPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -226,8 +225,8 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
       `Booking ID: ${(data as any).id}, Status: booking_confirmed`
     )
 
-    setCurrentStep(4)
-    setLoading(false)
+    // Redirect to booking detail page to see the full 13-step flow
+    router.push(`/bookings/${(data as any).id}`)
   }
 
   function handleVoiceSearch() {
@@ -599,54 +598,6 @@ export default function BookPage({ searchParams }: { searchParams: Promise<{ q?:
             {loading ? 'Confirming...' : `Confirm & Book — PKR ${pricingResult.totalEstimatedPKR}`}
             {!loading && <CheckCircle size={18} />}
           </button>
-        </div>
-      )}
-
-      {/* Step 5: Confirmation */}
-      {currentStep === 4 && selectedProvider && parsedRequest && pricingResult && (
-        <div className="space-y-6 text-center py-8">
-          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle size={40} className="text-emerald-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900">Booking Confirmed!</h2>
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3 text-left max-w-md mx-auto">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Service</span>
-              <span className="font-medium">{parsedRequest.serviceType}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Provider</span>
-              <span className="font-medium">{selectedProvider.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Time Slot</span>
-              <span className="font-medium">{selectedSlot}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Total</span>
-              <span className="font-bold text-emerald-600">PKR {pricingResult.totalEstimatedPKR}</span>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => router.push('/bookings')}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700"
-            >
-              View Bookings
-            </button>
-            <button
-              onClick={() => {
-                setCurrentStep(0)
-                setQuery('')
-                setParsedRequest(null)
-                setSelectedProvider(null)
-                setPricingResult(null)
-              }}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50"
-            >
-              Book Another
-            </button>
-          </div>
         </div>
       )}
 
