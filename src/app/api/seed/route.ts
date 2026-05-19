@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { Database } from '@/types/database'
 
 type ProviderInsert = Database['public']['Tables']['providers']['Insert']
@@ -843,7 +843,7 @@ const providers: ProviderInsert[] = [
 ]
 
 export async function GET() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   // Check if providers already exist
   const { count } = await supabase
