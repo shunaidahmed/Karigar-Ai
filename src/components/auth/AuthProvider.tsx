@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
@@ -23,39 +23,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
   const router = useRouter()
 
+  const checkOnboarding = useCallback(async (userId: string) => {
+    try {
+      const supabaseClient = createClient() as any
+      const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', userId)
+        .single()
+      if (error) {
+        setOnboardingCompleted(false)
+      } else {
+        setOnboardingCompleted(data?.onboarding_completed ?? false)
+      }
+    } catch {
+      setOnboardingCompleted(false)
+    }
+  }, [])
+
   useEffect(() => {
+    let mounted = true
+
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (mounted) {
+          setUser(session?.user ?? null)
+          if (session?.user) {
+            await checkOnboarding(session.user.id)
+          }
+          setLoading(false)
+        }
+      } catch {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initAuth()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        await checkOnboarding(session.user.id)
-      } else {
-        setOnboardingCompleted(true)
+      if (mounted) {
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          await checkOnboarding(session.user.id)
+        } else {
+          setOnboardingCompleted(true)
+        }
+        setLoading(false)
       }
-      setLoading(false)
     })
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        await checkOnboarding(session.user.id)
-      } else {
-        setOnboardingCompleted(true)
-      }
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
-
-  async function checkOnboarding(userId: string) {
-    const supabaseClient = createClient() as any
-    const { data } = await supabaseClient
-      .from('profiles')
-      .select('onboarding_completed')
-      .eq('id', userId)
-      .single()
-    setOnboardingCompleted(data?.onboarding_completed ?? false)
-  }
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [supabase, checkOnboarding])
 
   return (
     <AuthContext.Provider value={{ user, supabase, loading, onboardingCompleted, setOnboardingCompleted }}>
@@ -78,7 +102,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/')
+      router.replace('/')
     }
   }, [user, loading, router])
 
