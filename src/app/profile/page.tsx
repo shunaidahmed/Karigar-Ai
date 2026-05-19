@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
-import { LogOut, User, Globe, Wrench } from 'lucide-react'
+import { LogOut, User, Globe, Wrench, Shield, Bell, ChevronRight } from 'lucide-react'
 import type { Language } from '@/lib/translations'
 
 export default function ProfilePage() {
@@ -13,7 +13,6 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null)
   const [language, setLanguage] = useState<Language>('en')
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (user) fetchProfile()
@@ -21,12 +20,7 @@ export default function ProfilePage() {
 
   async function fetchProfile() {
     const supabaseClient = createClient() as any
-    const { data } = await supabaseClient
-      .from('profiles')
-      .select('*')
-      .eq('id', user?.id)
-      .single()
-
+    const { data } = await supabaseClient.from('profiles').select('*').eq('id', user?.id).single()
     if (data) {
       setProfile(data)
       setLanguage(data.language_preference || 'en')
@@ -41,19 +35,16 @@ export default function ProfilePage() {
 
   async function updateLanguage(lang: Language) {
     setLanguage(lang)
-    setSaving(true)
-
     const supabaseClient = createClient() as any
-    await supabaseClient
-      .from('profiles')
-      .update({ language_preference: lang, updated_at: new Date().toISOString() })
-      .eq('id', user?.id)
-
-    setSaving(false)
+    await supabaseClient.from('profiles').update({ language_preference: lang, updated_at: new Date().toISOString() }).eq('id', user?.id)
   }
 
   if (loading) {
-    return <div className="py-12 text-center text-gray-500">Loading...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+      </div>
+    )
   }
 
   if (!user) {
@@ -62,81 +53,96 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="py-6 space-y-6">
-      <h1 className="text-xl font-bold">Profile</h1>
-
-      {/* User Info */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center">
-            <User size={24} className="text-emerald-600" />
+    <div className="min-h-screen bg-gray-50 pb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative text-center">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-3">
+            <User size={32} className="text-white" />
           </div>
-          <div>
-            <h2 className="font-semibold text-lg">{profile?.full_name || 'User'}</h2>
-            <p className="text-sm text-gray-500">{user.email}</p>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
-          {profile?.phone && (
-            <p className="text-sm text-gray-600">Phone: {profile.phone}</p>
-          )}
-          {profile?.city && (
-            <p className="text-sm text-gray-600">City: {profile.city}</p>
-          )}
-          <p className="text-sm text-gray-600">
-            Loyalty: <span className="font-medium">{profile?.loyalty_status === 'returning' ? 'Returning User' : 'New User'}</span>
-          </p>
+          <h1 className="text-xl font-bold">{profile?.full_name || 'User'}</h1>
+          <p className="text-emerald-100 text-sm mt-1">{user.email}</p>
         </div>
       </div>
 
-      {/* Language Preference */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
-        <div className="flex items-center gap-2">
-          <Globe size={18} className="text-gray-600" />
-          <h3 className="font-medium">Language</h3>
+      {/* Profile Info */}
+      <div className="px-5 -mt-4 relative z-10">
+        <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+          {profile?.phone && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-gray-500 text-sm">Phone</span>
+              <span className="font-medium text-gray-900">{profile.phone}</span>
+            </div>
+          )}
+          {profile?.city && (
+            <div className="flex items-center justify-between py-2 border-t border-gray-100">
+              <span className="text-gray-500 text-sm">City</span>
+              <span className="font-medium text-gray-900">{profile.city}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between py-2 border-t border-gray-100">
+            <span className="text-gray-500 text-sm">Loyalty Status</span>
+            <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${profile?.loyalty_status === 'returning' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+              {profile?.loyalty_status === 'returning' ? 'Returning User' : 'New User'}
+            </span>
+          </div>
         </div>
-        <div className="space-y-1">
-          {[
-            { value: 'en', label: 'English' },
-            { value: 'ur-rom', label: 'Roman Urdu' },
-            { value: 'ur', label: 'Urdu (اردو)' },
-          ].map((lang) => (
-            <button
-              key={lang.value}
-              onClick={() => updateLanguage(lang.value as Language)}
-              disabled={saving}
-              className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${
-                language === lang.value
-                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-medium'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              {lang.label}
-            </button>
-          ))}
+      </div>
+
+      {/* Language */}
+      <div className="px-5 mt-4">
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe size={18} className="text-gray-600" />
+            <h3 className="font-bold text-gray-900">Language</h3>
+          </div>
+          <div className="space-y-2">
+            {[
+              { value: 'en', label: 'English' },
+              { value: 'ur-rom', label: 'Roman Urdu' },
+              { value: 'ur', label: 'Urdu (اردو)' },
+            ].map((lang) => (
+              <button
+                key={lang.value}
+                onClick={() => updateLanguage(lang.value as Language)}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all flex items-center justify-between ${
+                  language === lang.value
+                    ? 'bg-emerald-50 border-2 border-emerald-500 text-emerald-700 font-medium'
+                    : 'bg-gray-50 border-2 border-transparent text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {lang.label}
+                {language === lang.value && <ChevronRight size={16} className="text-emerald-600" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Developer Credits */}
+      <div className="px-5 mt-6">
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-5 text-center border border-emerald-100">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Wrench size={18} className="text-emerald-600" />
+            <span className="font-bold text-gray-900">Karigar.ai</span>
+          </div>
+          <p className="text-xs text-gray-500">
+            Developed by <span className="text-emerald-600 font-medium">Shunaid Ahmed</span>
+          </p>
+          <p className="text-xs text-gray-400 mt-1">AI Seekho 2026 • Har Karigar, Ek Click Dur</p>
         </div>
       </div>
 
       {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="w-full py-2.5 border border-red-300 text-red-600 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2 font-medium"
-      >
-        <LogOut size={16} />
-        Logout
-      </button>
-
-      {/* Developer Credits */}
-      <div className="pt-6 text-center border-t border-gray-200">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <Wrench size={16} className="text-emerald-600" />
-          <span className="text-sm font-medium text-gray-700">Karigar.ai</span>
-        </div>
-        <p className="text-xs text-gray-400">
-          Developed by <span className="text-emerald-600 font-medium">Shunaid Ahmed</span>
-        </p>
-        <p className="text-xs text-gray-300 mt-1">Har Karigar, Ek Click Dur</p>
+      <div className="px-5 mt-4">
+        <button
+          onClick={handleLogout}
+          className="w-full py-3 bg-white border border-red-200 text-red-600 rounded-xl hover:bg-red-50 flex items-center justify-center gap-2 font-medium transition-all"
+        >
+          <LogOut size={16} />
+          Logout
+        </button>
       </div>
     </div>
   )

@@ -5,16 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { agent7DisputeResolution, type DisputeResult } from '@/lib/agents/agent7-dispute'
-import { ArrowLeft, CheckCircle, AlertTriangle, MessageSquare } from 'lucide-react'
+import { ArrowLeft, CheckCircle, AlertTriangle, MessageSquare, Shield, ChevronRight, Sparkles } from 'lucide-react'
 
 const disputeTypes = [
-  { value: 'noShow', label: 'Provider No Show' },
-  { value: 'priceHigher', label: 'Price Higher Than Quoted' },
-  { value: 'poorQuality', label: 'Poor Quality Work' },
-  { value: 'rudeBehavior', label: 'Provider Rude/Unprofessional' },
-  { value: 'wrongService', label: 'Wrong Service Performed' },
-  { value: 'refundRequest', label: 'Refund Request' },
-  { value: 'lastMinuteCancel', label: 'Booking Cancelled Last Minute' },
+  { value: 'noShow', label: 'Provider No Show', icon: '🚫' },
+  { value: 'priceHigher', label: 'Price Higher Than Quoted', icon: '💰' },
+  { value: 'poorQuality', label: 'Poor Quality Work', icon: '🔧' },
+  { value: 'rudeBehavior', label: 'Provider Rude/Unprofessional', icon: '😤' },
+  { value: 'wrongService', label: 'Wrong Service Performed', icon: '❌' },
+  { value: 'refundRequest', label: 'Refund Request', icon: '💸' },
+  { value: 'lastMinuteCancel', label: 'Booking Cancelled Last Minute', icon: '⏰' },
 ]
 
 export default function DisputesPage({ searchParams }: { searchParams: Promise<{ booking?: string }> }) {
@@ -108,155 +108,191 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
 
   if (!showNewForm && disputes.length === 0) {
     return (
-      <div className="py-6 space-y-4">
-        <h1 className="text-xl font-bold">Disputes</h1>
-        <div className="text-center py-16">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MessageSquare size={28} className="text-gray-400" />
+      <div className="min-h-screen bg-gray-50 pb-8">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="relative flex items-center gap-3">
+            <Shield size={24} />
+            <div>
+              <h1 className="text-xl font-bold">Disputes</h1>
+              <p className="text-emerald-100 text-sm mt-1">Fair resolution, every time</p>
+            </div>
           </div>
-          <p className="text-gray-500 font-medium">No disputes filed</p>
-          <p className="text-sm text-gray-400 mt-1">
-            You can report a problem from any completed booking
-          </p>
+        </div>
+
+        {/* Empty State */}
+        <div className="px-5 -mt-4 relative z-10">
+          <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <MessageSquare size={28} className="text-emerald-600" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">No disputes filed</h2>
+            <p className="text-sm text-gray-500 mt-2">
+              You can report a problem from any completed booking
+            </p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="py-6 space-y-6">
-      {!showNewForm && !result && (
-        <>
-          <h1 className="text-xl font-bold">Disputes</h1>
-          <div className="grid gap-3 lg:grid-cols-2">
-            {disputes.map((dispute) => (
-              <div key={dispute.id} className="bg-white border border-gray-200 rounded-xl p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium">{dispute.dispute_type}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {dispute.bookings?.service_type}
-                    </p>
+    <div className="min-h-screen bg-gray-50 pb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative flex items-center gap-3">
+          <Shield size={24} />
+          <div>
+            <h1 className="text-xl font-bold">Disputes</h1>
+            <p className="text-emerald-100 text-sm mt-1">{disputes.length} dispute{disputes.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Disputes List */}
+      {!showNewForm && !result && disputes.length > 0 && (
+        <div className="px-5 -mt-4 relative z-10 space-y-3">
+          {disputes.map((dispute) => (
+            <div key={dispute.id} className="bg-white rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                    dispute.status === 'resolved' ? 'bg-emerald-100' :
+                    dispute.status === 'escalated' ? 'bg-red-100' : 'bg-yellow-100'
+                  }`}>
+                    {dispute.status === 'resolved' ? (
+                      <CheckCircle size={20} className="text-emerald-600" />
+                    ) : (
+                      <AlertTriangle size={20} className={dispute.status === 'escalated' ? 'text-red-600' : 'text-yellow-600'} />
+                    )}
                   </div>
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                      dispute.status === 'resolved'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : dispute.status === 'escalated'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                    }`}
-                  >
-                    {dispute.status}
-                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{dispute.dispute_type}</h3>
+                    <p className="text-sm text-gray-500">{dispute.bookings?.service_type}</p>
+                  </div>
                 </div>
+                <ChevronRight size={20} className="text-gray-400" />
+              </div>
+
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${
+                  dispute.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' :
+                  dispute.status === 'escalated' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {dispute.status}
+                </span>
                 {dispute.compensation_pkr > 0 && (
-                  <p className="text-sm font-semibold text-emerald-600 mt-3">
-                    Compensation: PKR {dispute.compensation_pkr}
-                  </p>
+                  <span className="font-bold text-emerald-600">PKR {dispute.compensation_pkr}</span>
                 )}
               </div>
-            ))}
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* New Dispute Form */}
       {showNewForm && !result && bookingData && (
-        <div className="space-y-4">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft size={16} />
-            <span className="text-sm">Back</span>
-          </button>
+        <div className="px-5 -mt-4 relative z-10">
+          <div className="bg-white rounded-2xl shadow-sm p-5 space-y-4">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 mb-2"
+            >
+              <ArrowLeft size={16} />
+              <span className="text-sm">Back</span>
+            </button>
 
-          <h2 className="text-lg font-semibold">Report a Problem</h2>
-          <p className="text-sm text-gray-600">
-            Booking: {bookingData.service_type} — {bookingData.providers?.name}
-          </p>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Dispute Type</label>
-            <div className="space-y-1">
-              {disputeTypes.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setSelectedType(type.value)}
-                  className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${
-                    selectedType === type.value
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-medium'
-                      : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                >
-                  {type.label}
-                </button>
-              ))}
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle size={18} className="text-red-600" />
+              <h2 className="font-bold text-gray-900">Report a Problem</h2>
             </div>
-          </div>
+            <p className="text-sm text-gray-500">
+              Booking: {bookingData.service_type} — {bookingData.providers?.name}
+            </p>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the issue in any language..."
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-              rows={4}
-            />
-          </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Dispute Type</label>
+              <div className="space-y-2">
+                {disputeTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => setSelectedType(type.value)}
+                    className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-all flex items-center gap-3 ${
+                      selectedType === type.value
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-medium'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-lg">{type.icon}</span>
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          <button
-            onClick={handleSubmitDispute}
-            disabled={loading || !selectedType || !description.trim()}
-            className="w-full py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 font-medium"
-          >
-            {loading ? 'Processing...' : 'Submit Dispute'}
-          </button>
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe the issue in any language..."
+                className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                rows={4}
+              />
+            </div>
+
+            <button
+              onClick={handleSubmitDispute}
+              disabled={loading || !selectedType || !description.trim()}
+              className="w-full py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 font-medium transition-all"
+            >
+              {loading ? 'Processing...' : 'Submit Dispute'}
+            </button>
+          </div>
         </div>
       )}
 
       {/* Resolution Result */}
       {result && (
-        <div className="space-y-4">
-          <div
-            className={`rounded-xl p-5 ${
-              result.likelyFault === 'provider'
-                ? 'bg-emerald-50 border border-emerald-200'
-                : result.likelyFault === 'user'
-                ? 'bg-amber-50 border border-amber-200'
-                : 'bg-gray-50 border border-gray-200'
-            }`}
-          >
+        <div className="px-5 -mt-4 relative z-10 space-y-4">
+          <div className={`rounded-2xl p-5 ${
+            result.likelyFault === 'provider'
+              ? 'bg-emerald-50 border border-emerald-200'
+              : result.likelyFault === 'user'
+              ? 'bg-amber-50 border border-amber-200'
+              : 'bg-white border border-gray-200'
+          }`}>
             <div className="flex items-center gap-2 mb-3">
               {result.likelyFault === 'provider' ? (
                 <CheckCircle size={20} className="text-emerald-600" />
               ) : (
                 <AlertTriangle size={20} className="text-amber-600" />
               )}
-              <h3 className="font-semibold">Resolution</h3>
+              <h3 className="font-bold">Resolution</h3>
             </div>
-            <p className="text-sm">{result.messageToUser}</p>
+            <p className="text-sm text-gray-700">{result.messageToUser}</p>
             {result.compensationPKR > 0 && (
-              <p className="text-xl font-bold text-emerald-600 mt-3">
-                Compensation: PKR {result.compensationPKR}
-              </p>
+              <div className="mt-4 bg-white rounded-xl p-3 flex items-center justify-between">
+                <span className="text-sm text-gray-500">Compensation</span>
+                <span className="text-xl font-bold text-emerald-600">PKR {result.compensationPKR}</span>
+              </div>
             )}
             {result.escalateToHuman && (
-              <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
-                <p className="font-medium">Escalated to Human Support</p>
-                <p className="text-xs mt-1">{result.escalationReason}</p>
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-3">
+                <p className="font-medium text-red-700 text-sm">Escalated to Human Support</p>
+                <p className="text-xs text-red-600 mt-1">{result.escalationReason}</p>
               </div>
             )}
           </div>
 
           <button
             onClick={() => router.push('/bookings')}
-            className="w-full py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-medium"
+            className="w-full py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-medium transition-all"
           >
             View Bookings
           </button>

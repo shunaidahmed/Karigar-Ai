@@ -4,41 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
-import { Clock, CheckCircle, AlertCircle, CalendarPlus } from 'lucide-react'
+import { Clock, CheckCircle, AlertCircle, CalendarPlus, ChevronRight, Sparkles } from 'lucide-react'
 
-const statusIcons: Record<string, any> = {
-  requested: Clock,
-  understood: Clock,
-  provider_selected: Clock,
-  slot_confirmed: Clock,
-  price_approved: Clock,
-  booking_confirmed: CheckCircle,
-  in_progress: Clock,
-  completed: CheckCircle,
-  closed: CheckCircle,
-  disputed: AlertCircle,
-  resolved: CheckCircle,
-  cancelled: AlertCircle,
-}
-
-const statusColors: Record<string, string> = {
-  booking_confirmed: 'text-emerald-600',
-  in_progress: 'text-blue-600',
-  completed: 'text-emerald-600',
-  closed: 'text-gray-600',
-  disputed: 'text-red-600',
-  resolved: 'text-emerald-600',
-  cancelled: 'text-gray-400',
-}
-
-const statusBg: Record<string, string> = {
-  booking_confirmed: 'bg-emerald-50',
-  in_progress: 'bg-blue-50',
-  completed: 'bg-emerald-50',
-  closed: 'bg-gray-50',
-  disputed: 'bg-red-50',
-  resolved: 'bg-emerald-50',
-  cancelled: 'bg-gray-50',
+const statusConfig: Record<string, { icon: any; color: string; bg: string; label: string }> = {
+  booking_confirmed: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-100', label: 'Confirmed' },
+  in_progress: { icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100', label: 'In Progress' },
+  completed: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-100', label: 'Completed' },
+  closed: { icon: CheckCircle, color: 'text-gray-600', bg: 'bg-gray-100', label: 'Closed' },
+  disputed: { icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-100', label: 'Disputed' },
+  resolved: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-100', label: 'Resolved' },
+  cancelled: { icon: AlertCircle, color: 'text-gray-400', bg: 'bg-gray-100', label: 'Cancelled' },
 }
 
 export default function BookingsPage() {
@@ -65,20 +40,24 @@ export default function BookingsPage() {
   }
 
   if (loading) {
-    return <div className="py-12 text-center text-gray-500">Loading bookings...</div>
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
+      </div>
+    )
   }
 
   if (bookings.length === 0) {
     return (
-      <div className="py-16 text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CalendarPlus size={28} className="text-gray-400" />
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
+        <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mb-4">
+          <CalendarPlus size={32} className="text-emerald-600" />
         </div>
-        <p className="text-gray-500 font-medium">No bookings yet</p>
-        <p className="text-sm text-gray-400 mt-1">Book your first service now</p>
+        <h2 className="text-xl font-bold text-gray-900">No bookings yet</h2>
+        <p className="text-gray-500 text-sm mt-1 text-center">Book your first service and track it here</p>
         <button
           onClick={() => router.push('/book')}
-          className="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          className="mt-6 px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-all"
         >
           Book a Service
         </button>
@@ -87,40 +66,47 @@ export default function BookingsPage() {
   }
 
   return (
-    <div className="py-6 space-y-4">
-      <h1 className="text-xl font-bold">Your Bookings</h1>
-      <div className="grid gap-3 lg:grid-cols-2">
+    <div className="min-h-screen bg-gray-50 pb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white px-5 pt-12 pb-8 rounded-b-3xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <h1 className="text-2xl font-bold relative">My Bookings</h1>
+        <p className="text-emerald-100 text-sm mt-1 relative">{bookings.length} booking{bookings.length !== 1 ? 's' : ''}</p>
+      </div>
+
+      {/* Bookings List */}
+      <div className="px-5 -mt-4 relative z-10 space-y-3">
         {bookings.map((booking) => {
-          const Icon = statusIcons[booking.status] || Clock
-          const color = statusColors[booking.status] || 'text-gray-600'
-          const bg = statusBg[booking.status] || 'bg-gray-50'
+          const config = statusConfig[booking.status] || statusConfig.booking_confirmed
+          const Icon = config.icon
 
           return (
             <button
               key={booking.id}
               onClick={() => router.push(`/bookings/${booking.id}`)}
-              className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-emerald-500 transition-all"
+              className="w-full bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-all text-left"
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{booking.service_type}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {booking.providers?.name || 'Provider'}
-                  </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <Icon size={20} className={config.color} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{booking.service_type}</h3>
+                    <p className="text-sm text-gray-500">{booking.providers?.name || 'Provider'}</p>
+                  </div>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${bg} ${color}`}>
-                  <Icon size={12} />
-                  <span className="capitalize">{booking.status.replace('_', ' ')}</span>
-                </div>
+                <ChevronRight size={20} className="text-gray-400" />
               </div>
-              {booking.total_price_pkr && (
-                <p className="text-sm font-semibold text-gray-700 mt-3">
-                  PKR {booking.total_price_pkr}
-                </p>
-              )}
-              <p className="text-xs text-gray-400 mt-1">
-                {new Date(booking.created_at).toLocaleDateString()}
-              </p>
+
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                <div className={`px-2.5 py-1 rounded-lg text-xs font-medium ${config.bg} ${config.color}`}>
+                  {config.label}
+                </div>
+                {booking.total_price_pkr && (
+                  <span className="font-bold text-gray-900">PKR {booking.total_price_pkr}</span>
+                )}
+              </div>
             </button>
           )
         })}
