@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { LoginForm, SignupForm } from '@/components/auth/AuthForms'
-import { Mic, Search, Wrench, Clock, Star } from 'lucide-react'
+import { Mic, Search, Wrench, Clock, Star, Snowflake, Zap, Wrench as WrenchIcon, BookOpen, Car, Flame, Lightbulb, Droplets } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const trendingServices = [
-  { name: 'AC Repair', icon: '❄️' },
-  { name: 'Electrician', icon: '⚡' },
-  { name: 'Plumber', icon: '🔧' },
-  { name: 'Home Tutor', icon: '📚' },
-  { name: 'Mechanic', icon: '🔩' },
-  { name: 'Gas Refill', icon: '🔥' },
-  { name: 'Wiring', icon: '💡' },
-  { name: 'Pipe Leak', icon: '💧' },
+  { name: 'AC Repair', icon: Snowflake },
+  { name: 'Electrician', icon: Zap },
+  { name: 'Plumber', icon: WrenchIcon },
+  { name: 'Home Tutor', icon: BookOpen },
+  { name: 'Mechanic', icon: Car },
+  { name: 'Gas Refill', icon: Flame },
+  { name: 'Wiring', icon: Lightbulb },
+  { name: 'Pipe Leak', icon: Droplets },
 ]
 
 export default function HomePage() {
@@ -177,7 +177,7 @@ export default function HomePage() {
               }}
               className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
             >
-              <span className="text-lg">{service.icon}</span>
+              <service.icon size={18} className="text-emerald-600" />
               {service.name}
             </button>
           ))}
