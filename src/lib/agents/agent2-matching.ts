@@ -118,20 +118,35 @@ export function agent2ProviderMatching(
     jobComplexity = 'intermediate'
   }
 
-  const filtered = providers.filter((p) => {
-    const serviceMatch = calculateSkillMatch(p, request.serviceType) > 0
-    const cityMatch = !request.location || p.city.toLowerCase().includes(request.location.toLowerCase())
-    return serviceMatch && (cityMatch || providers.filter((pr) => calculateSkillMatch(pr, request.serviceType) > 0).length === 0)
-  })
+  // Step 1: Filter by service type only (location is secondary)
+  const serviceMatched = providers.filter((p) => calculateSkillMatch(p, request.serviceType) > 0)
 
-  const candidates = filtered.length > 0 ? filtered : providers.filter((p) => calculateSkillMatch(p, request.serviceType) > 0)
-
-  if (candidates.length === 0) {
+  if (serviceMatched.length === 0) {
     return {
       jobComplexity,
       totalProvidersEvaluated: providers.length,
       rankedProviders: [],
     }
+  }
+
+  // Step 2: If location is specified, prioritize local providers but keep others
+  let candidates = serviceMatched
+  if (request.location && request.location.trim() !== '') {
+    const localProviders = serviceMatched.filter((p) =>
+      p.city.toLowerCase().includes(request.location.toLowerCase()) ||
+      p.areas.some((a) => a.toLowerCase().includes(request.location.toLowerCase()))
+    )
+
+    // If we found local providers, use them. Otherwise use all service-matched providers.
+    if (localProviders.length > 0) {
+      candidates = localProviders
+    }
+    // If no local providers, candidates stays as all service-matched providers
+  }
+
+  // Always ensure we have candidates
+  if (candidates.length === 0) {
+    candidates = serviceMatched
   }
 
   const priceScores = calculatePriceScore(candidates)
@@ -142,11 +157,19 @@ export function agent2ProviderMatching(
     const onTimeScore = p.on_time_score
     const reviewScore = calculateReviewScore(p.recent_review_sentiment, p.recent_review_date)
     const cancellationScore = calculateCancellationScore(p.cancellation_rate)
-    const distanceScore = calculateDistanceScore()
     const riskScore = calculateRiskScore(p.risk_score)
     const priceScore = priceScores.get(p.id) || 50
     const capacityScore = calculateCapacityScore(p)
     const certScore = p.certifications.length > 0 ? 100 : 0
+
+    // Location bonus: providers in the requested city get +10 points
+    let locationBonus = 0
+    if (request.location && request.location.trim() !== '') {
+      if (p.city.toLowerCase().includes(request.location.toLowerCase()) ||
+          p.areas.some((a) => a.toLowerCase().includes(request.location.toLowerCase()))) {
+        locationBonus = 10
+      }
+    }
 
     const matchScore = Math.round(
       skillMatch * 0.2 +
@@ -154,11 +177,12 @@ export function agent2ProviderMatching(
       onTimeScore * 0.15 +
       reviewScore * 0.1 +
       cancellationScore * 0.1 +
-      distanceScore * 0.1 +
+      75 * 0.1 +
       riskScore * 0.05 +
       priceScore * 0.05 +
       capacityScore * 0.03 +
-      certScore * 0.02
+      certScore * 0.02 +
+      locationBonus
     )
 
     return {
