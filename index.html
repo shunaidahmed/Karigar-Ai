@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Karigar.ai - AI Service Orchestrator for Pakistan's Informal Economy">
+  <meta name="theme-color" content="#0EA5E9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Karigar">
+  
+  <title>Karigar.ai - Har Karigar, Ek Click Dur</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Offline Banner -->
+  <div class="offline-banner">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+    </svg>
+    <span data-i18n="offline_message">You're offline. Some features may be limited.</span>
+  </div>
+
+  <div id="app">
+    <!-- ===== SCREEN 1: HOME ===== -->
+    <div id="screen-home" class="screen active">
+      <header class="header">
+        <div class="header-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <span class="header-title">Karigar.ai</span>
+        </div>
+        <div class="header-actions">
+          <div class="header-lang-toggle">
+            <button class="header-lang-btn active" data-lang="en">EN</button>
+            <button class="header-lang-btn" data-lang="ur-rom">RO</button>
+            <button class="header-lang-btn" data-lang="ur">اردو</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <!-- Search Section -->
+        <section class="search-section">
+          <div class="search-container">
+            <input type="text" id="search-input" class="search-input" 
+                   placeholder="Describe your service need..." 
+                   data-placeholder-en="Describe your service need..."
+                   data-placeholder-ur-rom="Apni service ki zaroorat batao..."
+                   data-placeholder-ur="اپنی سروس کی ضرورت بتائیں...">
+            <button id="mic-btn" class="search-mic-btn" title="Speak your request">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
+          </div>
+          <button id="submit-request" class="btn btn-primary btn-block" style="margin-top: var(--space-md);">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            <span data-i18n="find_service">Find Service</span>
+          </button>
+        </section>
+
+        <!-- Service Chips -->
+        <section class="service-chips-section">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span data-i18n="trending_services">Trending Services</span>
+          </h3>
+          <div class="service-chips">
+            <button class="service-chip" data-service="AC Repair">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+              </svg>
+              <span>AC Repair</span>
+            </button>
+            <button class="service-chip" data-service="Electrician">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+              <span>Electrician</span>
+            </button>
+            <button class="service-chip" data-service="Plumber">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 3v12"/>
+                <circle cx="18" cy="6" r="3"/>
+                <path d="M6 15a6 6 0 0 0 12 0"/>
+              </svg>
+              <span>Plumber</span>
+            </button>
+            <button class="service-chip" data-service="Home Tutor">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              <span>Home Tutor</span>
+            </button>
+            <button class="service-chip" data-service="Mechanic">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              <span>Mechanic</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Recent Bookings -->
+        <section id="recent-bookings-section" class="recent-bookings">
+          <h3 class="section-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span data-i18n="recent_bookings">Recent Bookings</span>
+          </h3>
+          <div id="recent-bookings-list">
+            <!-- Populated by JavaScript -->
+          </div>
+        </section>
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-screen="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label" data-i18n="nav_home">Home</span>
+        </button>
+        <button class="nav-item" data-screen="bookings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="nav-label" data-i18n="nav_bookings">Bookings</span>
+        </button>
+        <button class="nav-item" data-screen="providers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="nav-label" data-i18n="nav_providers">Providers</span>
+        </button>
+        <button class="nav-item" data-screen="help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span class="nav-label" data-i18n="nav_help">Help</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- ===== SCREEN 2: REQUEST FLOW ===== -->
+    <div id="screen-request" class="screen">
+      <header class="header">
+        <button id="back-to-home" class="btn btn-icon btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="request_understanding">Request Understanding</span>
+        <div class="confidence-badge confidence-high" id="confidence-badge">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span id="confidence-score">95%</span>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div id="parsed-summary" class="parsed-summary">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="clarification-section" class="card" style="display: none;">
+          <h4 class="card-title" data-i18n="clarification_needed">Need some clarification</h4>
+          <p id="clarification-question" style="color: var(--color-text-secondary); margin-bottom: var(--space-md);"></p>
+          <input type="text" id="clarification-input" class="search-input" 
+                 style="background: var(--color-bg-tertiary); padding: var(--space-md); border-radius: var(--radius-lg); margin-bottom: var(--space-md);">
+          <button id="submit-clarification" class="btn btn-primary btn-block" data-i18n="submit_answer">Submit Answer</button>
+        </div>
+
+        <button id="proceed-matching" class="btn btn-primary btn-block" data-i18n="proceed_to_matching">
+          Proceed to Provider Matching
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 3: PROVIDER SELECTION ===== -->
+    <div id="screen-providers" class="screen">
+      <header class="header">
+        <button class="btn btn-icon btn-secondary" onclick="navigateTo('request')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="select_provider">Select Provider</span>
+      </header>
+
+      <main class="main-content">
+        <div id="provider-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 4: SCHEDULING ===== -->
+    <div id="screen-scheduling" class="screen">
+      <header class="header">
+        <button class="btn btn-icon btn-secondary" onclick="navigateTo('providers')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="schedule_appointment">Schedule Appointment</span>
+      </header>
+
+      <main class="main-content">
+        <div id="selected-provider-info" class="card">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <h4 class="section-title" style="margin-top: var(--space-lg);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span data-i18n="select_date">Select Date</span>
+        </h4>
+        
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <h4 class="section-title" style="margin-top: var(--space-lg);">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span data-i18n="select_time">Select Time</span>
+        </h4>
+
+        <div class="time-slots" id="time-slots">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="conflict-message" class="card" style="display: none; border-color: var(--color-accent-warning);">
+          <h4 style="color: var(--color-accent-warning); margin-bottom: var(--space-sm);">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle;">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span data-i18n="scheduling_conflict">Scheduling Conflict</span>
+          </h4>
+          <p id="conflict-reason" style="color: var(--color-text-secondary); margin-bottom: var(--space-md);"></p>
+          <h5 data-i18n="alternative_slots" style="margin-bottom: var(--space-sm);">Alternative Slots Available:</h5>
+          <div id="alternative-slots" class="time-slots">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <button id="confirm-slot" class="btn btn-primary btn-block" style="margin-top: var(--space-xl);" disabled data-i18n="confirm_slot">
+          Confirm Slot
+        </button>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 5: PRICING ===== -->
+    <div id="screen-pricing" class="screen">
+      <header class="header">
+        <button class="btn btn-icon btn-secondary" onclick="navigateTo('scheduling')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="price_quote">Price Quote</span>
+      </header>
+
+      <main class="main-content">
+        <div id="pricing-breakdown" class="pricing-card">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="fairness-summary" class="card">
+          <h4 class="card-title" data-i18n="fairness_summary">Fairness Summary</h4>
+          <p id="fairness-user" style="color: var(--color-text-secondary); margin-bottom: var(--space-sm);"></p>
+          <p id="fairness-provider" style="color: var(--color-text-secondary);"></p>
+        </div>
+
+        <button id="confirm-booking" class="btn btn-primary btn-block" style="margin-top: var(--space-lg);" data-i18n="confirm_and_book">
+          Confirm & Book
+        </button>
+        <button id="cancel-booking" class="btn btn-secondary btn-block" style="margin-top: var(--space-sm);" data-i18n="cancel">Cancel</button>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 6: BOOKING TRACKER ===== -->
+    <div id="screen-tracker" class="screen">
+      <header class="header">
+        <span class="header-title" data-i18n="booking_progress">Booking Progress</span>
+      </header>
+
+      <main class="main-content">
+        <div id="booking-details" class="card" style="margin-bottom: var(--space-lg);">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="booking-timeline" class="timeline">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div id="notification-bubbles">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <button id="view-receipt" class="btn btn-secondary btn-block" style="margin-top: var(--space-lg); display: none;" data-i18n="view_receipt">
+          View Receipt
+        </button>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 7: FEEDBACK ===== -->
+    <div id="screen-feedback" class="screen">
+      <header class="header">
+        <button class="btn btn-icon btn-secondary" onclick="navigateTo('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="rate_service">Rate Service</span>
+      </header>
+
+      <main class="main-content">
+        <div class="card">
+          <h4 class="card-title" style="text-align: center; margin-bottom: var(--space-lg);">
+            <span data-i18n="how_was_service">How was your experience with</span>
+            <br>
+            <span id="feedback-provider-name" style="color: var(--color-accent-primary);"></span>
+          </h4>
+
+          <div class="rating-container">
+            <div class="rating-stars" id="rating-stars">
+              <svg class="rating-star" data-rating="1" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <svg class="rating-star" data-rating="2" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <svg class="rating-star" data-rating="3" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <svg class="rating-star" data-rating="4" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <svg class="rating-star" data-rating="5" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+            <p id="rating-label" class="rating-label" data-i18n="tap_to_rate">Tap to rate</p>
+          </div>
+
+          <label style="display: block; margin-bottom: var(--space-sm); color: var(--color-text-secondary);" data-i18n="additional_feedback">Additional Feedback (Optional)</label>
+          <textarea id="feedback-comment" class="dispute-textarea" rows="4" 
+                    placeholder="Share your experience..."
+                    data-placeholder-en="Share your experience..."
+                    data-placeholder-ur-rom="Apna tajurba likho..."
+                    data-placeholder-ur="اپنا تجربہ لکھیں..."></textarea>
+
+          <button id="submit-feedback" class="btn btn-primary btn-block" disabled data-i18n="submit_feedback">
+            Submit Feedback
+          </button>
+        </div>
+
+        <div id="feedback-result" class="resolution-card" style="display: none;">
+          <div class="resolution-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+            </svg>
+          </div>
+          <h3 class="resolution-title" data-i18n="thank_you">Thank You!</h3>
+          <p id="thank-you-message" class="resolution-message"></p>
+          <div class="resolution-compensation">
+            <p class="resolution-label" data-i18n="new_provider_rating">New Provider Rating</p>
+            <p id="new-rating-display" class="resolution-amount"></p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 8: DISPUTE CENTER ===== -->
+    <div id="screen-dispute" class="screen">
+      <header class="header">
+        <button class="btn btn-icon btn-secondary" onclick="navigateTo('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <span class="header-title" data-i18n="report_problem">Report a Problem</span>
+      </header>
+
+      <main class="main-content">
+        <div class="card">
+          <h4 class="card-title" style="margin-bottom: var(--space-lg);" data-i18n="what_issue">What's the issue?</h4>
+          
+          <div class="dispute-types" id="dispute-types">
+            <button class="dispute-type-btn" data-type="no_show">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              <span data-i18n="no_show">Provider No-Show</span>
+            </button>
+            <button class="dispute-type-btn" data-type="price_dispute">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              <span data-i18n="price_dispute">Price Dispute</span>
+            </button>
+            <button class="dispute-type-btn" data-type="quality">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span data-i18n="poor_quality">Poor Quality</span>
+            </button>
+            <button class="dispute-type-btn" data-type="rude">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M8 15h8"/>
+                <path d="M9 9h.01"/>
+                <path d="M15 9h.01"/>
+              </svg>
+              <span data-i18n="provider_rude">Provider Rude</span>
+            </button>
+            <button class="dispute-type-btn" data-type="wrong_service">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              <span data-i18n="wrong_service">Wrong Service</span>
+            </button>
+            <button class="dispute-type-btn" data-type="refund">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              </svg>
+              <span data-i18n="refund_request">Refund Request</span>
+            </button>
+          </div>
+
+          <label style="display: block; margin-bottom: var(--space-sm); color: var(--color-text-secondary);" data-i18n="describe_issue">Describe the issue</label>
+          <textarea id="dispute-description" class="dispute-textarea" rows="5"
+                    placeholder="Please describe what happened..."
+                    data-placeholder-en="Please describe what happened..."
+                    data-placeholder-ur-rom="Kya hua wo likho..."
+                    data-placeholder-ur="کیا ہوا وہ لکھیں..."></textarea>
+
+          <button id="submit-dispute" class="btn btn-primary btn-block" disabled data-i18n="submit_dispute">
+            Submit Dispute
+          </button>
+        </div>
+
+        <div id="dispute-resolution" class="resolution-card" style="display: none;">
+          <div class="resolution-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h3 id="resolution-title" class="resolution-title" data-i18n="resolution">Resolution</h3>
+          <p id="resolution-message" class="resolution-message"></p>
+          <div id="resolution-compensation" class="resolution-compensation" style="display: none;">
+            <p class="resolution-label" data-i18n="compensation">Compensation</p>
+            <p id="compensation-amount" class="resolution-amount"></p>
+          </div>
+          <button id="resolution-done" class="btn btn-primary" data-i18n="done">Done</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== SCREEN 9: BOOKINGS LIST ===== -->
+    <div id="screen-bookings" class="screen">
+      <header class="header">
+        <span class="header-title" data-i18n="my_bookings">My Bookings</span>
+      </header>
+
+      <main class="main-content">
+        <div id="bookings-list">
+          <!-- Populated by JavaScript -->
+        </div>
+      </main>
+
+      <nav class="bottom-nav">
+        <button class="nav-item" data-screen="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-item active" data-screen="bookings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="nav-label">Bookings</span>
+        </button>
+        <button class="nav-item" data-screen="providers">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="nav-label">Providers</span>
+        </button>
+        <button class="nav-item" data-screen="help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span class="nav-label">Help</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Trace Panel (Drawer) -->
+  <div id="trace-panel" class="trace-panel">
+    <div class="trace-panel-header">
+      <h3 class="trace-panel-title">Agent Activity Log</h3>
+      <button id="close-trace" class="trace-close-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="trace-panel-body" id="trace-list">
+      <!-- Populated by JavaScript -->
+    </div>
+    <button id="export-trace" class="btn btn-secondary trace-export-btn" data-i18n="export_logs">
+      Export Logs
+    </button>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text" data-i18n="processing">Processing...</p>
+    <p class="loading-agent" id="loading-agent-name">Agent 1: Language Understanding</p>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Modal -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Modal Title</h3>
+        <button id="modal-close" class="modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modal-body">
+        <!-- Modal content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Trace FAB -->
+  <button id="trace-fab" class="trace-fab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 20h9"/>
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+    <span class="trace-fab-badge" id="trace-count">0</span>
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
