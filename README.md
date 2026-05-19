@@ -1,81 +1,36 @@
-# Karigar.ai
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-**Har Karigar, Ek Click Dur**
+## Getting Started
 
-Karigar.ai is a Progressive Web Application prototype for Pakistan's informal service economy. It uses an AI-powered seven-agent workflow to turn a natural language service request into a confirmed booking with provider matching, scheduling, pricing, tracking, feedback, and dispute resolution.
+First, run the development server:
 
-## Overview
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-This project is a PWA submission for AI Seekho 2026. It is designed to help users easily find and book local service workers like electricians, plumbers, AC technicians, mechanics, and tutors using multilingual text and voice input.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Key Features
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- Multilingual input handling (Urdu, Roman Urdu, English)
-- AI-driven request parsing and clarification
-- Provider ranking with match scoring and risk screening
-- Scheduling with conflict detection and alternative slot suggestions
-- Dynamic pricing with transparent breakdown and budget alternatives
-- Booking simulation with lifecycle tracking and reminders
-- Feedback-driven reputation updates
-- Dispute resolution workflow with escalation rules
-- Offline-readiness for app shell and saved data
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Architecture
+## Learn More
 
-Karigar.ai is built as a single-file PWA with the following layers:
+To learn more about Next.js, take a look at the following resources:
 
-- App Shell: `index.html`, `style.css`, `app.js`
-- PWA support: `manifest.json`, `sw.js`
-- Mock data: `providers.json`
-- AI orchestration: Gemini API and Google Antigravity prompt design
-- Local storage: persistent user data, booking state, and trace logs
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Technology Stack
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- HTML5, CSS3, Vanilla JavaScript
-- Progressive Web App (service worker, manifest)
-- Google Fonts
-- Web Speech API for voice input
-- Gemini 2.0 Flash API for AI reasoning
-- Google Antigravity for agent orchestration
-- LocalStorage for persistence
+## Deploy on Vercel
 
-## Repository Structure
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-- `Karigar-Ai.md` — Full system design document
-- `README.md` — Project overview and usage guide
-- `manifest.json` — PWA metadata and install configuration
-- `sw.js` — Offline caching and service worker logic
-- `providers.json` — Mock provider dataset
-- `assets/` — Icons and branding assets
-- `docs/` — Architecture and trace documentation
-
-## How to Use
-
-1. Open the project in a modern browser.
-2. Load `index.html`.
-3. Provide a service request using text or voice.
-4. Follow the AI-driven booking flow through provider selection, scheduling, pricing, and tracking.
-
-## Deployment
-
-This prototype can be deployed as a static PWA on services like Netlify. For a production-ready deployment, move the Gemini API key to a secure server-side proxy or environment variable.
-
-## Testing Plan
-
-The design document includes several test scenarios, including:
-
-- Happy path booking flow
-- Low confidence input clarification
-- No provider available fallback
-- Scheduling conflict handling
-- Price dispute resolution
-- Urdu script parsing
-- Provider cancellation and reassignment
-
-## Notes
-
-- All provider data is mock data.
-- Notifications, SMS, and payment flows are simulated.
-- The current prototype stores data in `localStorage`.
-- The Gemini API key should not remain client-side in a production application.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
