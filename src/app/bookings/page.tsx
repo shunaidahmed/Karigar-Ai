@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
-import { Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { Clock, CheckCircle, AlertCircle, CalendarPlus } from 'lucide-react'
 
 const statusIcons: Record<string, any> = {
   requested: Clock,
@@ -31,6 +31,16 @@ const statusColors: Record<string, string> = {
   cancelled: 'text-gray-400',
 }
 
+const statusBg: Record<string, string> = {
+  booking_confirmed: 'bg-emerald-50',
+  in_progress: 'bg-blue-50',
+  completed: 'bg-emerald-50',
+  closed: 'bg-gray-50',
+  disputed: 'bg-red-50',
+  resolved: 'bg-emerald-50',
+  cancelled: 'bg-gray-50',
+}
+
 export default function BookingsPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -55,16 +65,20 @@ export default function BookingsPage() {
   }
 
   if (loading) {
-    return <div className="py-8 text-center text-gray-500">Loading bookings...</div>
+    return <div className="py-12 text-center text-gray-500">Loading bookings...</div>
   }
 
   if (bookings.length === 0) {
     return (
-      <div className="py-12 text-center">
-        <p className="text-gray-500">No bookings yet</p>
+      <div className="py-16 text-center">
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CalendarPlus size={28} className="text-gray-400" />
+        </div>
+        <p className="text-gray-500 font-medium">No bookings yet</p>
+        <p className="text-sm text-gray-400 mt-1">Book your first service now</p>
         <button
           onClick={() => router.push('/book')}
-          className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+          className="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
         >
           Book a Service
         </button>
@@ -75,39 +89,42 @@ export default function BookingsPage() {
   return (
     <div className="py-6 space-y-4">
       <h1 className="text-xl font-bold">Your Bookings</h1>
-      {bookings.map((booking) => {
-        const Icon = statusIcons[booking.status] || Clock
-        const color = statusColors[booking.status] || 'text-gray-600'
+      <div className="grid gap-3 lg:grid-cols-2">
+        {bookings.map((booking) => {
+          const Icon = statusIcons[booking.status] || Clock
+          const color = statusColors[booking.status] || 'text-gray-600'
+          const bg = statusBg[booking.status] || 'bg-gray-50'
 
-        return (
-          <button
-            key={booking.id}
-            onClick={() => router.push(`/bookings/${booking.id}`)}
-            className="w-full bg-white border border-gray-200 rounded-lg p-4 text-left hover:border-emerald-500"
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-semibold text-gray-900">{booking.service_type}</h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  {booking.providers?.name || 'Provider'}
+          return (
+            <button
+              key={booking.id}
+              onClick={() => router.push(`/bookings/${booking.id}`)}
+              className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-emerald-500 transition-all"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-semibold text-gray-900">{booking.service_type}</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {booking.providers?.name || 'Provider'}
+                  </p>
+                </div>
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${bg} ${color}`}>
+                  <Icon size={12} />
+                  <span className="capitalize">{booking.status.replace('_', ' ')}</span>
+                </div>
+              </div>
+              {booking.total_price_pkr && (
+                <p className="text-sm font-semibold text-gray-700 mt-3">
+                  PKR {booking.total_price_pkr}
                 </p>
-              </div>
-              <div className={`flex items-center gap-1 ${color}`}>
-                <Icon size={16} />
-                <span className="text-sm capitalize">{booking.status.replace('_', ' ')}</span>
-              </div>
-            </div>
-            {booking.total_price_pkr && (
-              <p className="text-sm font-medium text-gray-700 mt-2">
-                PKR {booking.total_price_pkr}
+              )}
+              <p className="text-xs text-gray-400 mt-1">
+                {new Date(booking.created_at).toLocaleDateString()}
               </p>
-            )}
-            <p className="text-xs text-gray-400 mt-1">
-              {new Date(booking.created_at).toLocaleDateString()}
-            </p>
-          </button>
-        )
-      })}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

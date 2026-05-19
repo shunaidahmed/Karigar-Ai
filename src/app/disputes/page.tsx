@@ -5,16 +5,16 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { createClient } from '@/lib/supabase/client'
 import { agent7DisputeResolution, type DisputeResult } from '@/lib/agents/agent7-dispute'
-import { ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, AlertTriangle, MessageSquare } from 'lucide-react'
 
 const disputeTypes = [
-  { value: 'noShow', label: 'Provider No Show', labelUr: 'پرووائیڈر نہیں آیا' },
-  { value: 'priceHigher', label: 'Price Higher Than Quoted', labelUr: 'قیمت کوٹ سے زیادہ' },
-  { value: 'poorQuality', label: 'Poor Quality Work', labelUr: 'کام خراب' },
-  { value: 'rudeBehavior', label: 'Provider Rude/Unprofessional', labelUr: 'پرووائیڈر بدتمیز' },
-  { value: 'wrongService', label: 'Wrong Service Performed', labelUr: 'غلط سروس' },
-  { value: 'refundRequest', label: 'Refund Request', labelUr: 'رقم واپس چاہیے' },
-  { value: 'lastMinuteCancel', label: 'Booking Cancelled Last Minute', labelUr: 'آخری منٹ منسوخی' },
+  { value: 'noShow', label: 'Provider No Show' },
+  { value: 'priceHigher', label: 'Price Higher Than Quoted' },
+  { value: 'poorQuality', label: 'Poor Quality Work' },
+  { value: 'rudeBehavior', label: 'Provider Rude/Unprofessional' },
+  { value: 'wrongService', label: 'Wrong Service Performed' },
+  { value: 'refundRequest', label: 'Refund Request' },
+  { value: 'lastMinuteCancel', label: 'Booking Cancelled Last Minute' },
 ]
 
 export default function DisputesPage({ searchParams }: { searchParams: Promise<{ booking?: string }> }) {
@@ -64,7 +64,6 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
     if (!user || !selectedType || !description || !bookingData) return
     setLoading(true)
 
-    // Call Agent 7
     const disputeResult = await agent7DisputeResolution(
       selectedType,
       description,
@@ -78,7 +77,6 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
 
     setResult(disputeResult)
 
-    // Save to Supabase
     const supabase = createClient() as any
     await supabase.from('disputes').insert({
       booking_id: bookingData.id,
@@ -100,7 +98,6 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
       status: disputeResult.escalateToHuman ? 'escalated' : 'resolved',
     })
 
-    // Update booking status
     await supabase
       .from('bookings')
       .update({ status: 'disputed' })
@@ -113,9 +110,12 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
     return (
       <div className="py-6 space-y-4">
         <h1 className="text-xl font-bold">Disputes</h1>
-        <div className="text-center py-12">
-          <p className="text-gray-500">No disputes filed</p>
-          <p className="text-sm text-gray-400 mt-2">
+        <div className="text-center py-16">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageSquare size={28} className="text-gray-400" />
+          </div>
+          <p className="text-gray-500 font-medium">No disputes filed</p>
+          <p className="text-sm text-gray-400 mt-1">
             You can report a problem from any completed booking
           </p>
         </div>
@@ -128,34 +128,36 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
       {!showNewForm && !result && (
         <>
           <h1 className="text-xl font-bold">Disputes</h1>
-          {disputes.map((dispute) => (
-            <div key={dispute.id} className="bg-white border border-gray-200 rounded-lg p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium">{dispute.dispute_type}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {dispute.bookings?.service_type}
-                  </p>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {disputes.map((dispute) => (
+              <div key={dispute.id} className="bg-white border border-gray-200 rounded-xl p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{dispute.dispute_type}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {dispute.bookings?.service_type}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                      dispute.status === 'resolved'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : dispute.status === 'escalated'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}
+                  >
+                    {dispute.status}
+                  </span>
                 </div>
-                <span
-                  className={`px-2 py-1 rounded text-xs font-medium ${
-                    dispute.status === 'resolved'
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : dispute.status === 'escalated'
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
-                >
-                  {dispute.status}
-                </span>
+                {dispute.compensation_pkr > 0 && (
+                  <p className="text-sm font-semibold text-emerald-600 mt-3">
+                    Compensation: PKR {dispute.compensation_pkr}
+                  </p>
+                )}
               </div>
-              {dispute.compensation_pkr > 0 && (
-                <p className="text-sm font-medium text-emerald-600 mt-2">
-                  Compensation: PKR {dispute.compensation_pkr}
-                </p>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       )}
 
@@ -182,9 +184,9 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
                 <button
                   key={type.value}
                   onClick={() => setSelectedType(type.value)}
-                  className={`w-full text-left px-3 py-2 rounded-lg border text-sm ${
+                  className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${
                     selectedType === type.value
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700 font-medium'
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
@@ -203,7 +205,7 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe the issue in any language..."
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               rows={4}
             />
           </div>
@@ -211,7 +213,7 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
           <button
             onClick={handleSubmitDispute}
             disabled={loading || !selectedType || !description.trim()}
-            className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+            className="w-full py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 font-medium"
           >
             {loading ? 'Processing...' : 'Submit Dispute'}
           </button>
@@ -222,30 +224,30 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
       {result && (
         <div className="space-y-4">
           <div
-            className={`rounded-lg p-4 ${
+            className={`rounded-xl p-5 ${
               result.likelyFault === 'provider'
                 ? 'bg-emerald-50 border border-emerald-200'
                 : result.likelyFault === 'user'
-                ? 'bg-yellow-50 border border-yellow-200'
+                ? 'bg-amber-50 border border-amber-200'
                 : 'bg-gray-50 border border-gray-200'
             }`}
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               {result.likelyFault === 'provider' ? (
                 <CheckCircle size={20} className="text-emerald-600" />
               ) : (
-                <AlertTriangle size={20} className="text-yellow-600" />
+                <AlertTriangle size={20} className="text-amber-600" />
               )}
               <h3 className="font-semibold">Resolution</h3>
             </div>
             <p className="text-sm">{result.messageToUser}</p>
             {result.compensationPKR > 0 && (
-              <p className="text-lg font-semibold text-emerald-600 mt-2">
+              <p className="text-xl font-bold text-emerald-600 mt-3">
                 Compensation: PKR {result.compensationPKR}
               </p>
             )}
             {result.escalateToHuman && (
-              <div className="mt-2 bg-red-50 border border-red-200 rounded p-2 text-sm text-red-700">
+              <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
                 <p className="font-medium">Escalated to Human Support</p>
                 <p className="text-xs mt-1">{result.escalationReason}</p>
               </div>
@@ -254,7 +256,7 @@ export default function DisputesPage({ searchParams }: { searchParams: Promise<{
 
           <button
             onClick={() => router.push('/bookings')}
-            className="w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+            className="w-full py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 font-medium"
           >
             View Bookings
           </button>

@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthProvider'
 import { LoginForm, SignupForm } from '@/components/auth/AuthForms'
-import { Mic, Search } from 'lucide-react'
+import { Mic, Search, Wrench, Clock, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const trendingServices = [
-  'AC Repair',
-  'Electrician',
-  'Plumber',
-  'Home Tutor',
-  'Mechanic',
-  'Gas Refill',
-  'Wiring',
-  'Pipe Leak',
+  { name: 'AC Repair', icon: '❄️' },
+  { name: 'Electrician', icon: '⚡' },
+  { name: 'Plumber', icon: '🔧' },
+  { name: 'Home Tutor', icon: '📚' },
+  { name: 'Mechanic', icon: '🔩' },
+  { name: 'Gas Refill', icon: '🔥' },
+  { name: 'Wiring', icon: '💡' },
+  { name: 'Pipe Leak', icon: '💧' },
 ]
 
 export default function HomePage() {
@@ -86,6 +86,9 @@ export default function HomePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[80vh]">
         <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Wrench size={32} className="text-emerald-600" />
+          </div>
           <h1 className="text-3xl font-bold text-emerald-600">Karigar.ai</h1>
           <p className="text-gray-600 mt-1">Har Karigar, Ek Click Dur</p>
         </div>
@@ -99,9 +102,12 @@ export default function HomePage() {
   }
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="py-6 space-y-8">
       {/* Header */}
       <div className="text-center">
+        <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <Wrench size={28} className="text-emerald-600" />
+        </div>
         <h1 className="text-2xl font-bold text-emerald-600">Karigar.ai</h1>
         <p className="text-sm text-gray-500 mt-1">Har Karigar, Ek Click Dur</p>
       </div>
@@ -115,7 +121,7 @@ export default function HomePage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Describe what you need..."
-            className="w-full rounded-xl border border-gray-300 pl-4 pr-24 py-3 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="w-full rounded-xl border border-gray-300 pl-4 pr-24 py-3 text-gray-900 placeholder-gray-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
             <button
@@ -160,18 +166,19 @@ export default function HomePage() {
 
       {/* Trending Services */}
       <div>
-        <h2 className="text-sm font-semibold text-gray-700 mb-2">Trending Services</h2>
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Trending Services</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {trendingServices.map((service) => (
             <button
-              key={service}
+              key={service.name}
               onClick={() => {
-                setSearchQuery(service)
-                router.push(`/book?q=${encodeURIComponent(service)}`)
+                setSearchQuery(service.name)
+                router.push(`/book?q=${encodeURIComponent(service.name)}`)
               }}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 whitespace-nowrap hover:border-emerald-500 hover:text-emerald-600"
+              className="flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
             >
-              {service}
+              <span className="text-lg">{service.icon}</span>
+              {service.name}
             </button>
           ))}
         </div>
@@ -180,16 +187,22 @@ export default function HomePage() {
       {/* Recent Bookings */}
       {recentBookings.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Recent Bookings</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">Recent Bookings</h2>
           <div className="space-y-2">
             {recentBookings.map((booking) => (
               <button
                 key={booking.id}
                 onClick={() => router.push(`/bookings/${booking.id}`)}
-                className="w-full bg-white border border-gray-200 rounded-lg p-3 text-left hover:border-emerald-500"
+                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-emerald-500 transition-all flex items-center justify-between"
               >
-                <p className="font-medium text-gray-900">{booking.service_type}</p>
-                <p className="text-sm text-gray-500 capitalize">{booking.status.replace('_', ' ')}</p>
+                <div>
+                  <p className="font-medium text-gray-900">{booking.service_type}</p>
+                  <p className="text-sm text-gray-500 capitalize flex items-center gap-1 mt-0.5">
+                    <Clock size={12} />
+                    {booking.status.replace('_', ' ')}
+                  </p>
+                </div>
+                <Star size={16} className="text-gray-300" />
               </button>
             ))}
           </div>

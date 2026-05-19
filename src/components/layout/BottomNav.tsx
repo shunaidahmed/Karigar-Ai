@@ -24,8 +24,8 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center justify-center w-full h-full ${
-                isActive ? 'text-emerald-600' : 'text-gray-500'
+              className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+                isActive ? 'text-emerald-600' : 'text-gray-400'
               }`}
             >
               <Icon size={20} />
